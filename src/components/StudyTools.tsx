@@ -179,7 +179,7 @@ const StudyTools = ({ subjectId }: StudyToolsProps) => {
         toast.success('Flashcards gerados com sucesso pela IA!');
         console.log('Flashcards processados:', generatedCards);
       } catch (parseError: any) {
-        console.error('Erro de parsing JSON nos dados recebidos:', parseError);
+        console.error('Erro de parqusing JSON nos dados recebidos:', parseError);
         setFlashcardsError(`Erro ao analisar os flashcards da IA: ${parseError.message}. Verifique o formato JSON retornado pelo n8n.`);
         toast.error('Erro ao processar flashcards: Formato inválido da IA.');
       }
@@ -296,7 +296,7 @@ const StudyTools = ({ subjectId }: StudyToolsProps) => {
                 >
                   <div className="text-center">
                     <p className="text-lg font-medium text-gray-800 mb-4">
-                      {showAnswer ? "Answer:" : "Question:"}
+                      {showAnswer ? "Answer:" : "Questão:"}
                     </p>
                     <p className="text-xl text-gray-700">
                       {showAnswer ? flashcardsToDisplay[currentCardIndex].back : flashcardsToDisplay[currentCardIndex].front}
