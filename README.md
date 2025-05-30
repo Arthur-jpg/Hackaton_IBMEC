@@ -62,4 +62,6 @@ Para o Hackathon, o MVP do Estuda.ia se concentrará nas funcionalidades essenci
 * **Banco de Dados:** PostgreSQL e Vector Database Store (via Supabase, se viável para o MVP) [cite: 1]
 * **Cloud:** Google Cloud Platform (para deploy e serviços adicionais, se necessário). [cite: 1]
 
+### Deploy:
+ https://hackaton-c1e87.web.app/
 ---
