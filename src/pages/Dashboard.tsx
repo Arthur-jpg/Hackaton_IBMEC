@@ -1,11 +1,13 @@
-// src/pages/Dashboard.tsx
-import { useNavigate, Link } from 'react-router-dom'; // Added Link
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { User, LogOut } from 'lucide-react';
 import EventCalendar from '@/components/EventCalendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '../components/contexts/authContext';
+import { doSignOut } from '../components/firebase/auth'; // ✅ Import logout
+import { toast } from '@/components/ui/sonner'; // ✅ Optional: toast
 
-// Dummy SVG components (as provided)
+// Dummy icon components
 const Zap = ({ className = "" }: { className?: string }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -26,7 +28,6 @@ const BookOpen = ({ className = "" }: { className?: string }) => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v11.494m0 0A7.5 7.5 0 0019.5 12H4.5A7.5 7.5 0 0012 17.747m0-11.494A7.5 7.5 0 004.5 12h15A7.5 7.5 0 0012 6.253z" />
   </svg>
 );
-
 
 const subjects = [
   {
@@ -61,9 +62,19 @@ const subjects = [
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { currentUser, userProfile } = useAuth();
 
-  const handleLogout = () => {
-    navigate('/');
+  const displayName = userProfile?.name || currentUser?.email || 'Estudante';
+
+  const handleLogout = async () => {
+    try {
+      await doSignOut(); // ✅ Sign out from Firebase
+      toast.success('Logout successful'); // Optional
+      navigate('/'); // Redirect to login
+    } catch (error) {
+      console.error('Logout failed:', error);
+      toast.error('Erro ao sair');
+    }
   };
 
   return (
@@ -72,19 +83,18 @@ const Dashboard = () => {
         <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
           <div className="animate-fade-in">
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Bem-vindo de volta, Hudson! 👋
+              Bem-vindo de volta, {displayName}! 👋
             </h1>
             <p className="text-gray-600 mt-1 md:mt-2">Gerencie sua agenda e datas importantes.</p>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* Updated this section to be a Link */}
             <Link
               to="/profile"
               className="group flex items-center gap-2 bg-white/70 backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2 hover:bg-white/90 transition-colors duration-150 cursor-pointer"
             >
               <User className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 group-hover:text-purple-700 transition-colors duration-150" />
               <span className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-purple-700 transition-colors duration-150">
-                Estudante Hudson
+                {displayName}
               </span>
             </Link>
             <Button

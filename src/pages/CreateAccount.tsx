@@ -1,148 +1,110 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { BookOpen, Heart, UserPlus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Navigate, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../components/contexts/authContext';
+import { doCreateUserWithEmailAndPassword } from '../components/firebase/auth';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from '../components/firebase/firebase';
 
-const CreateAccount = () => {
-  const [fullName, setFullName] = useState('');
+const Register = () => {
+  const navigate = useNavigate();
+  const { userLoggedIn, setUserProfile, setCurrentUser } = useAuth(); // ✅ include setters
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [name, setName] = useState('');
+  const [universityId, setUniversityId] = useState('');
+  const [major, setMajor] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleCreateAccount = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!fullName || !email || !password || !confirmPassword) {
-      toast({
-        title: "Informações Faltando", // Translated
-        description: "Por favor, preencha todos os campos.", // Translated
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (password !== confirmPassword) {
-      toast({
-        title: "Senhas Não Coincidem", // Translated
-        description: "As senhas não coincidem. Por favor, digite novamente.", // Translated
-        variant: "destructive",
-      });
+      setErrorMessage('Passwords do not match');
       return;
     }
 
-    if (!/\S+@\S+\.\S+/.test(email)) {
-        toast({
-            title: "Email Inválido", // Translated
-            description: "Por favor, insira um endereço de email válido.", // Translated
-            variant: "destructive",
-        });
-        return;
-    }
+    try {
+      setIsRegistering(true);
+      const user = await doCreateUserWithEmailAndPassword(email, password, {
+        name,
+        universityId,
+        major,
+      });
 
-    console.log('Tentativa de criação de conta:', { fullName, email, password }); // "Account creation attempt" -> "Tentativa de criação de conta"
-    toast({
-      title: "Conta Criada! 🎉", // Translated
-      description: "Bem-vindo ao StudyHub! Agora você pode fazer login.", // Translated
-    });
-    navigate('/');
+      // ✅ fetch and set userProfile manually
+      const userDoc = await getDoc(doc(db, 'id', user.uid));
+      if (userDoc.exists()) {
+        setCurrentUser(user);
+        setUserProfile(userDoc.data());
+      }
+
+      navigate('/dashboard');
+    } catch (err) {
+      setErrorMessage(err.message || 'Something went wrong');
+      setIsRegistering(false);
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-3 rounded-full">
-              <BookOpen className="h-8 w-8 text-white" />
-            </div>
-            <Heart className="h-6 w-6 text-pink-500 animate-pulse" />
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            StudyHub {/* Brand name, can remain or be translated if desired */}
-          </h1>
-          <p className="text-gray-600 mt-2">Junte-se ao seu adorável companheiro de aprendizado</p> {/* Translated */}
-        </div>
+  if (userLoggedIn) return <Navigate to="/dashboard" replace />;
 
-        <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm animate-scale-in">
-          <CardHeader className="text-center">
-            <div className="flex justify-center items-center mb-3">
-                <UserPlus className="h-8 w-8 text-purple-600"/>
-            </div>
-            <CardTitle className="text-2xl font-semibold text-gray-800">Crie Sua Conta</CardTitle> {/* Translated */}
-            <CardDescription className="text-gray-600">Vamos começar sua jornada de aprendizado!</CardDescription> {/* Translated */}
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleCreateAccount} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">Nome Completo</Label> {/* Translated */}
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="Digite seu nome completo" // Translated
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label> {/* Email is commonly used, or "Correio Eletrônico" */}
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Digite seu email" // Translated
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">Senha</Label> {/* Translated */}
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Crie uma senha" // Translated
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirmar Senha</Label> {/* Translated */}
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Digite novamente sua senha" // Translated
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
-              >
-                Criar Conta {/* Translated */}
-              </Button>
-            </form>
-          </CardContent>
-          <CardFooter className="text-center block mt-4">
-            <p className="text-sm text-gray-600">
-              Já tem uma conta?{' '} {/* Translated */}
-              <Link to="/" className="font-medium text-purple-600 hover:text-purple-700 hover:underline">
-                Entrar {/* Translated */}
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
+  return (
+    <main className="w-full h-screen flex justify-center items-center">
+      <div className="w-96 text-gray-600 space-y-5 p-4 shadow-xl border rounded-xl">
+        <h3 className="text-center text-xl font-semibold">Create a New Account</h3>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <Input label="Name" value={name} onChange={setName} />
+          <Input label="University ID" value={universityId} onChange={setUniversityId} />
+          <Input label="Major" value={major} onChange={setMajor} />
+          <Input label="Email" value={email} onChange={setEmail} type="email" />
+          <Input label="Password" value={password} onChange={setPassword} type="password" />
+          <Input label="Confirm Password" value={confirmPassword} onChange={setConfirmPassword} type="password" />
+
+          {errorMessage && <div className="text-red-600 font-bold">{errorMessage}</div>}
+
+          <button
+            type="submit"
+            disabled={isRegistering}
+            className={`w-full px-4 py-2 text-white font-medium rounded-lg ${
+              isRegistering ? 'bg-gray-300' : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
+          >
+            {isRegistering ? 'Signing Up...' : 'Sign Up'}
+          </button>
+
+          <div className="text-sm text-center">
+            Already have an account? <Link to="/login" className="font-bold hover:underline">Login</Link>
+          </div>
+        </form>
       </div>
-    </div>
+    </main>
   );
 };
 
-export default CreateAccount;
+// Small reusable input component
+const Input = ({
+  label,
+  value,
+  onChange,
+  type = 'text',
+}: {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  type?: string;
+}) => (
+  <div>
+    <label className="text-sm text-gray-600 font-bold">{label}</label>
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      required
+      className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg transition duration-300"
+    />
+  </div>
+);
+
+export default Register;

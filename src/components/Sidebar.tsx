@@ -32,7 +32,7 @@ const Sidebar = ({ currentPage, onPageChange }: SidebarProps) => {
             <BookOpen className="h-6 w-6 text-white" />
           </div>
           <Heart className="h-4 w-4 text-pink-500 animate-pulse" />
-          <span className="font-semibold text-gray-800">StudyHub</span> {/* Brand name, kept as is */}
+          <span className="font-semibold text-gray-800">Estuda.AI</span> {/* Brand name, kept as is */}
         </div>
       </div>
 
