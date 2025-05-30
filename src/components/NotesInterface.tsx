@@ -20,7 +20,7 @@ interface NotesInterfaceProps {
   onOpenChange: (isOpen: boolean) => void;
 }
 
-const LOCAL_STORAGE_KEY = 'studyHubNotes_v2'; // Changed key in case of structure changes
+const LOCAL_STORAGE_KEY = 'studyHubNotes_v2';
 
 const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange }) => {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -31,50 +31,47 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
 
   const getNoteTitle = useCallback((content: string): string => {
     const firstLine = content.split('\n')[0].trim();
-    return firstLine.substring(0, 40) || 'New Note'
+    return firstLine.substring(0, 40) || 'Nova Anotação'; // Translated "New Note"
   }, []);
 
   useEffect(() => {
     if (isOpen) {
-      console.log("NotesInterface: Dialog opened, loading notes.");
+      // console.log("NotesInterface: Dialog opened, loading notes.");
       const storedNotes = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (storedNotes) {
         try {
           const parsedNotes: Note[] = JSON.parse(storedNotes);
           setNotes(parsedNotes.sort((a,b) => b.lastModified - a.lastModified));
-          if (parsedNotes.length > 0 && !selectedNoteId) {
-          } else if (selectedNoteId) {
+          if (selectedNoteId) { // Ensure selected note content is loaded if it exists
             const selected = parsedNotes.find(n => n.id === selectedNoteId);
             setCurrentContent(selected ? selected.content : '');
           }
         } catch (e) {
-          console.error("Failed to parse notes from localStorage", e);
+          console.error("Falha ao analisar anotações do localStorage", e); // Translated "Failed to parse notes from localStorage"
           setNotes([]);
         }
       } else {
         setNotes([]);
       }
     }
-  
-  }, [isOpen]); 
+  }, [isOpen, selectedNoteId]); // Added selectedNoteId dependency to reload content if it was selected before closing
+
   useEffect(() => {
-     if (isOpen) { 
-        console.log("NotesInterface: notes state changed, saving to localStorage.", notes);
+     if (isOpen) {
+        // console.log("NotesInterface: notes state changed, saving to localStorage.", notes);
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
      }
   }, [notes, isOpen]);
 
-  // Update currentContent when selectedNoteId changes
   useEffect(() => {
     if (selectedNoteId) {
       const selected = notes.find(n => n.id === selectedNoteId);
       setCurrentContent(selected ? selected.content : '');
-      console.log("NotesInterface: Selected note changed to:", selectedNoteId);
+      // console.log("NotesInterface: Selected note changed to:", selectedNoteId);
     } else {
       setCurrentContent('');
     }
   }, [selectedNoteId, notes]);
-
 
   const updateNoteInState = useCallback((noteId: string, newContent: string) => {
     setNotes(prevNotes => {
@@ -82,10 +79,10 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
       const newTitle = getNoteTitle(newContent);
 
       if (noteToUpdate && noteToUpdate.content === newContent && noteToUpdate.title === newTitle) {
-        return prevNotes;
+        return prevNotes; // No actual change in content or auto-generated title
       }
-      
-      console.log("NotesInterface: Updating note in state:", noteId);
+
+      // console.log("NotesInterface: Updating note in state:", noteId);
       return prevNotes
         .map(n =>
           n.id === noteId
@@ -96,41 +93,39 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
     });
   }, [getNoteTitle]);
 
-  // Debounced auto-save for textarea content changes
   useEffect(() => {
     if (!selectedNoteId || !isOpen) return;
 
     const handler = setTimeout(() => {
-      console.log("NotesInterface: Debounced save triggered for note:", selectedNoteId);
+      // console.log("NotesInterface: Debounced save triggered for note:", selectedNoteId);
       updateNoteInState(selectedNoteId, currentContent);
-    }, 1500); // Auto-save after 1.5 seconds
+    }, 1500);
 
     return () => {
       clearTimeout(handler);
     };
   }, [currentContent, selectedNoteId, isOpen, updateNoteInState]);
 
-
   const handleNewNote = () => {
     const newNote: Note = {
       id: Date.now().toString(),
-      title: 'New Note',
+      title: 'Nova Anotação', // Translated "New Note"
       content: '',
       lastModified: Date.now(),
     };
     setNotes(prevNotes => [newNote, ...prevNotes].sort((a,b)=>b.lastModified - a.lastModified));
     setSelectedNoteId(newNote.id);
-    setCurrentContent(''); // Editor is now blank for the new note
-    toast({ title: 'New Note Created! 🗒️' });
-    console.log("NotesInterface: New note created:", newNote.id);
+    setCurrentContent('');
+    toast({ title: 'Nova Anotação Criada! 🗒️' }); // Translated
+    // console.log("NotesInterface: New note created:", newNote.id);
   };
 
   const handleSelectNote = (noteId: string) => {
     if (selectedNoteId && selectedNoteId !== noteId) {
       const currentNoteFromState = notes.find(n => n.id === selectedNoteId);
       if (currentNoteFromState && currentNoteFromState.content !== currentContent) {
-        console.log("NotesInterface: Saving note before switch:", selectedNoteId);
-        updateNoteInState(selectedNoteId, currentContent); 
+        // console.log("NotesInterface: Saving note before switch:", selectedNoteId);
+        updateNoteInState(selectedNoteId, currentContent);
       }
     }
     setSelectedNoteId(noteId);
@@ -138,16 +133,17 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
 
   const handleDeleteNote = () => {
     if (!selectedNoteId) return;
-    console.log("NotesInterface: Deleting note:", selectedNoteId);
-    setNotes(prevNotes => prevNotes.filter(n => n.id !== selectedNoteId));
-    const remainingNotes = notes.filter(n => n.id !== selectedNoteId);
-    if (remainingNotes.length > 0) {
-        setSelectedNoteId(remainingNotes.sort((a,b) => b.lastModified - a.lastModified)[0].id);
+    // console.log("NotesInterface: Deleting note:", selectedNoteId);
+    const notesAfterDeletion = notes.filter(n => n.id !== selectedNoteId);
+    setNotes(notesAfterDeletion);
+
+    if (notesAfterDeletion.length > 0) {
+      setSelectedNoteId(notesAfterDeletion.sort((a,b) => b.lastModified - a.lastModified)[0].id);
     } else {
-        setSelectedNoteId(null);
+      setSelectedNoteId(null);
     }
-    setCurrentContent(''); // Clear editor
-    toast({ title: 'Note Deleted! 🗑️', variant: 'destructive' });
+    // setCurrentContent(''); // Content will be updated by useEffect on selectedNoteId change
+    toast({ title: 'Anotação Excluída! 🗑️', variant: 'destructive' }); // Translated
   };
 
   const filteredNotes = useMemo(() => {
@@ -158,13 +154,13 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
 
   const handleDialogStateChange = (openState: boolean) => {
     if (!openState && selectedNoteId) {
-      console.log("NotesInterface: Dialog closing, saving current note:", selectedNoteId);
+      // console.log("NotesInterface: Dialog closing, saving current note:", selectedNoteId);
       const currentNoteFromState = notes.find(n => n.id === selectedNoteId);
        if (currentNoteFromState && currentNoteFromState.content !== currentContent) {
          updateNoteInState(selectedNoteId, currentContent);
        }
     }
-    onOpenChange(openState); 
+    onOpenChange(openState);
   };
 
   const selectedNoteDetails = selectedNoteId ? notes.find(n => n.id === selectedNoteId) : null;
@@ -174,19 +170,19 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
       <DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 gap-0 bg-gray-50 dark:bg-neutral-900 backdrop-blur-md border-gray-200 dark:border-neutral-800 shadow-2xl rounded-lg">
         <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-neutral-800 shrink-0">
             <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={handleNewNote} aria-label="New Note">
+                <Button variant="ghost" size="icon" onClick={handleNewNote} aria-label="Nova Anotação"> {/* Translated aria-label */}
                     <PlusCircle className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                 </Button>
                 {selectedNoteId && (
-                    <Button variant="ghost" size="icon" onClick={handleDeleteNote} aria-label="Delete Note">
+                    <Button variant="ghost" size="icon" onClick={handleDeleteNote} aria-label="Excluir Anotação"> {/* Translated aria-label */}
                         <Trash2 className="h-5 w-5 text-red-500" />
                     </Button>
                 )}
             </div>
             <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px] sm:max-w-xs md:max-w-sm">
-                {selectedNoteDetails ? `Editing: ${selectedNoteDetails.title}` : 'All Notes'}
+                {selectedNoteDetails ? `Editando: ${selectedNoteDetails.title}` : 'Todas as Anotações'} {/* Translated "Editing", "All Notes" */}
             </span>
-            <Button variant="ghost" size="icon" onClick={() => handleDialogStateChange(false)} aria-label="Close Notes">
+            <Button variant="ghost" size="icon" onClick={() => handleDialogStateChange(false)} aria-label="Fechar Anotações"> {/* Translated aria-label */}
                 <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
             </Button>
         </div>
@@ -198,7 +194,7 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                 <Input
                   type="text"
-                  placeholder="Search notes..."
+                  placeholder="Buscar anotações..." // Translated
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 text-sm h-9 bg-white dark:bg-neutral-700 border-gray-300 dark:border-neutral-600 rounded-md"
@@ -219,7 +215,7 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
                     >
                       <div className="font-semibold text-sm truncate">{note.title}</div>
                       <div className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 h-8 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
-                        {note.content || "Empty note"}
+                        {note.content || "Anotação vazia"} {/* Translated "Empty note" */}
                       </div>
                       <div className="text-[11px] text-gray-500 dark:text-gray-500 mt-1.5">
                         {new Date(note.lastModified).toLocaleDateString()}
@@ -228,7 +224,7 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
                   ))
                 ) : (
                   <p className="p-4 text-sm text-center text-gray-500 dark:text-gray-400">
-                    {searchTerm ? "No notes match your search." : "No notes yet. Create one!"}
+                    {searchTerm ? "Nenhuma anotação corresponde à sua busca." : "Nenhuma anotação ainda. Crie uma!"} {/* Translated */}
                   </p>
                 )}
               </div>
@@ -241,12 +237,12 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
                 <div className="p-4 border-b border-gray-200 dark:border-neutral-700 shrink-0">
                     <div className="font-semibold text-lg text-gray-800 dark:text-gray-100 truncate">{selectedNoteDetails.title}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                        Last Modified: {new Date(selectedNoteDetails.lastModified).toLocaleString()}
+                        Última Modificação: {new Date(selectedNoteDetails.lastModified).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})} {/* Translated "Last Modified" and used locale string options */}
                     </div>
                 </div>
                 <Textarea
-                  key={selectedNoteId} // Force re-render of textarea on note switch to clear undo/redo stack
-                  placeholder="Start writing your note..."
+                  key={selectedNoteId} 
+                  placeholder="Comece a escrever sua anotação..." // Translated
                   value={currentContent}
                   onChange={(e) => setCurrentContent(e.target.value)}
                   className="flex-1 w-full h-full p-5 text-base border-0 rounded-none resize-none focus:ring-0 focus-visible:ring-0 bg-transparent dark:text-gray-50 selection:bg-purple-200 dark:selection:bg-purple-500/50"
@@ -255,10 +251,10 @@ const NotesInterface: React.FC<NotesInterfaceProps> = ({ isOpen, onOpenChange })
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 p-6 text-center">
                 <FilePenLine size={52} className="mb-5 opacity-40" />
-                <p className="text-xl font-medium mb-1">Select a note to view or edit</p>
-                <p className="text-sm mb-5">Or, create a new one to get started!</p>
+                <p className="text-xl font-medium mb-1">Selecione uma anotação para ver ou editar</p> {/* Translated */}
+                <p className="text-sm mb-5">Ou crie uma nova para começar!</p> {/* Translated */}
                 <Button onClick={handleNewNote} className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
-                    <PlusCircle className="mr-2 h-5 w-5" /> Create Your First Note
+                  <PlusCircle className="mr-2 h-5 w-5" /> Crie Sua Primeira Anotação {/* Translated */}
                 </Button>
               </div>
             )}

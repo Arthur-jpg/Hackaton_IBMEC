@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button'; //
-import { Input } from '@/components/ui/input'; //
-import { Label } from '@/components/ui/label'; //
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'; //
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { BookOpen, Heart, UserPlus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast'; //
+import { useToast } from '@/hooks/use-toast';
 
 const CreateAccount = () => {
   const [fullName, setFullName] = useState('');
@@ -13,15 +13,15 @@ const CreateAccount = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
-  const { toast } = useToast(); //
+  const { toast } = useToast();
 
   const handleCreateAccount = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!fullName || !email || !password || !confirmPassword) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all fields.",
+        title: "Informações Faltando", // Translated
+        description: "Por favor, preencha todos os campos.", // Translated
         variant: "destructive",
       });
       return;
@@ -29,31 +29,27 @@ const CreateAccount = () => {
 
     if (password !== confirmPassword) {
       toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match. Please re-enter.",
+        title: "Senhas Não Coincidem", // Translated
+        description: "As senhas não coincidem. Por favor, digite novamente.", // Translated
         variant: "destructive",
       });
       return;
     }
 
-    // Basic email validation (optional, more robust validation is usually backend)
     if (!/\S+@\S+\.\S+/.test(email)) {
         toast({
-            title: "Invalid Email",
-            description: "Please enter a valid email address.",
+            title: "Email Inválido", // Translated
+            description: "Por favor, insira um endereço de email válido.", // Translated
             variant: "destructive",
         });
         return;
     }
 
-    // Simulate account creation
-    console.log('Account creation attempt:', { fullName, email, password });
+    console.log('Tentativa de criação de conta:', { fullName, email, password }); // "Account creation attempt" -> "Tentativa de criação de conta"
     toast({
-      title: "Account Created! 🎉",
-      description: "Welcome to StudyHub! You can now log in.",
+      title: "Conta Criada! 🎉", // Translated
+      description: "Bem-vindo ao StudyHub! Agora você pode fazer login.", // Translated
     });
-    // In a real app, you'd make an API call here.
-    // For now, navigate to the login page after "creation".
     navigate('/');
   };
 
@@ -68,9 +64,9 @@ const CreateAccount = () => {
             <Heart className="h-6 w-6 text-pink-500 animate-pulse" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            StudyHub
+            StudyHub {/* Brand name, can remain or be translated if desired */}
           </h1>
-          <p className="text-gray-600 mt-2">Join your lovable learning companion</p>
+          <p className="text-gray-600 mt-2">Junte-se ao seu adorável companheiro de aprendizado</p> {/* Translated */}
         </div>
 
         <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm animate-scale-in">
@@ -78,68 +74,68 @@ const CreateAccount = () => {
             <div className="flex justify-center items-center mb-3">
                 <UserPlus className="h-8 w-8 text-purple-600"/>
             </div>
-            <CardTitle className="text-2xl font-semibold text-gray-800">Create Your Account</CardTitle>
-            <CardDescription className="text-gray-600">Let's get you started on your learning journey!</CardDescription>
+            <CardTitle className="text-2xl font-semibold text-gray-800">Crie Sua Conta</CardTitle> {/* Translated */}
+            <CardDescription className="text-gray-600">Vamos começar sua jornada de aprendizado!</CardDescription> {/* Translated */}
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCreateAccount} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">Full Name</Label>
+                <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">Nome Completo</Label> {/* Translated */}
                 <Input
                   id="fullName"
                   type="text"
-                  placeholder="Enter your full name"
+                  placeholder="Digite seu nome completo" // Translated
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label> {/* Email is commonly used, or "Correio Eletrônico" */}
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Digite seu email" // Translated
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700">Senha</Label> {/* Translated */}
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder="Crie uma senha" // Translated
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirmar Senha</Label> {/* Translated */}
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="Re-enter your password"
+                  placeholder="Digite novamente sua senha" // Translated
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
               >
-                Create Account
+                Criar Conta {/* Translated */}
               </Button>
             </form>
           </CardContent>
           <CardFooter className="text-center block mt-4">
             <p className="text-sm text-gray-600">
-              Already have an account?{' '}
+              Já tem uma conta?{' '} {/* Translated */}
               <Link to="/" className="font-medium text-purple-600 hover:text-purple-700 hover:underline">
-                Sign In
+                Entrar {/* Translated */}
               </Link>
             </p>
           </CardFooter>

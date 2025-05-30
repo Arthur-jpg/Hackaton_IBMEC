@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";  //
 import CreateAccount from "./pages/CreateAccount"; //
 
 import MainLayout from './components/MainLayout'; // Import the new layout
+import ProfilePage from './pages/ProfilePage';
 
 // PomodoroContext and related code remains the same
 interface PomodoroContextType {
@@ -117,6 +118,7 @@ const App = () => {
                   </MainLayout>
                 } 
               />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<NotFound />} /> 
             </Routes>
           </BrowserRouter>

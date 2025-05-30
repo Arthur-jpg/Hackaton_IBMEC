@@ -25,121 +25,145 @@ export interface SubjectTests {
 
 export const testData: Record<string, SubjectTests> = {
   electronics: {
-    subjectName: 'Electronics',
+    subjectName: 'Eletrônica', // Already in Portuguese, no change needed
     topics: [
       {
         topicId: 'elec_basics',
-        topicName: 'Circuit Basics',
+        topicName: 'Conceitos Básicos de Circuitos', // Translated from 'Circuit Basics'
         questions: [
           {
             id: 'q1_elec_basics',
-            text: "What is Ohm's Law?",
+            text: 'O que é a Lei de Ohm?', // Translated from "What is Ohm's Law?"
             type: 'multiple-choice',
-            options: [ /* ...options... */ { id: 'opt2_q1eb', text: 'V = I * R' } ], // Ensure options are filled
+            options: [
+              { id: 'opt1_q1eb', text: 'V = I / R' },
+              { id: 'opt2_q1eb', text: 'V = I * R' },
+              { id: 'opt3_q1eb', text: 'I = V * R' },
+              { id: 'opt4_q1eb', text: 'R = V * I' },
+            ],
             correctOptionId: 'opt2_q1eb',
           },
           {
             id: 'q2_elec_basics',
-            text: 'Which component allows current to flow in only one direction?',
+            text: 'Qual componente permite que a corrente flua em apenas uma direção?', // Translated from 'Which component allows current to flow in only one direction?'
             type: 'multiple-choice',
-            options: [/* ...options... */ { id: 'opt3_q2eb', text: 'Diode' } ],
+            options: [
+              { id: 'opt1_q2eb', text: 'Resistor' },
+              { id: 'opt2_q2eb', text: 'Capacitor' },
+              { id: 'opt3_q2eb', text: 'Diodo' }, // Translated from 'Diode'
+              { id: 'opt4_q2eb', text: 'Indutor' },
+            ],
             correctOptionId: 'opt3_q2eb',
           },
         ],
       },
       {
         topicId: 'elec_transistors',
-        topicName: 'Transistors',
+        topicName: 'Transistores', // Translated from 'Transistors'
         questions: [
           {
             id: 'q1_elec_transistors',
-            text: 'What does BJT stand for?',
+            text: 'O que significa BJT?', // Translated from 'What does BJT stand for?'
             type: 'multiple-choice',
-            options: [/* ...options... */ { id: 'opt2_q1et', text: 'Bipolar Junction Transistor' } ],
+            options: [
+              { id: 'opt1_q1et', text: 'Transdutor de Junção Básica' }, // Translated from 'Basic Junction Transducer'
+              { id: 'opt2_q1et', text: 'Transistor de Junção Bipolar' }, // Translated from 'Bipolar Junction Transistor'
+              { id: 'opt3_q1et', text: 'Transformador de Junta Balanceada' }, // Translated from 'Balanced Joint Transformer'
+              { id: 'opt4_q1et', text: 'Terminal de Junção de Banda Larga' }, // Translated from 'Broadband Junction Terminal'
+            ],
             correctOptionId: 'opt2_q1et',
           },
-          // Add more transistor questions
+          // Adicione mais perguntas sobre transistores
         ],
       },
     ],
   },
   'software-development': {
-    subjectName: 'Software Development',
+    subjectName: 'Desenvolvimento de Software', // Translated from 'Software Development'
     topics: [
       {
         topicId: 'sd_fundamentals',
-        topicName: 'Programming Fundamentals',
+        topicName: 'Fundamentos de Programação', // Translated from 'Programming Fundamentals'
         questions: [
           {
             id: 'q1_sd_fun',
-            text: 'What is a variable in programming?',
+            text: 'O que é uma variável em programação?', // Translated from 'What is a variable in programming?'
             type: 'multiple-choice',
-            options: [/* ...options... */ { id: 'opt2_q1sdf', text: 'A named storage location for data' } ],
+            options: [
+              { id: 'opt1_q1sdf', text: 'Um valor fixo' }, // Translated from 'A fixed value'
+              { id: 'opt2_q1sdf', text: 'Um local de armazenamento nomeado para dados' }, // Translated from 'A named storage location for data'
+              { id: 'opt3_q1sdf', text: 'Um tipo de função' }, // Translated from 'A type of function'
+              { id: 'opt4_q1sdf', text: 'Uma estrutura de laço' }, // Translated from 'A loop construct'
+            ],
             correctOptionId: 'opt2_q1sdf',
           },
-          // Add more fundamental questions
+          // Adicione mais perguntas fundamentais
         ],
       },
       {
         topicId: 'sd_vcs',
-        topicName: 'Version Control Systems',
+        topicName: 'Sistemas de Controle de Versão', // Translated from 'Version Control Systems'
         questions: [
           {
             id: 'q1_sd_vcs',
-            text: 'Which of these is a common version control system?',
+            text: 'Qual destes é um sistema de controle de versão comum?', // Translated from 'Which of these is a common version control system?'
             type: 'multiple-choice',
-            options: [/* ...options... */ { id: 'opt3_q1sdvcs', text: 'Git' } ],
+            options: [
+              { id: 'opt1_q1sdvcs', text: 'JPEG' },
+              { id: 'opt2_q1sdvcs', text: 'Docker' },
+              { id: 'opt3_q1sdvcs', text: 'Git' },
+              { id: 'opt4_q1sdvcs', text: 'Apache Kafka' },
+            ],
             correctOptionId: 'opt3_q1sdvcs',
           },
         ],
       }
     ],
   },
-  // Add other subjects (calculus, engineering-data) with their topics and questions
   calculus: {
-    subjectName: "Calculus I",
+    subjectName: "Cálculo I", // Already in Portuguese, no change needed
     topics: [
-        {
-            topicId: "calc_derivatives",
-            topicName: "Derivatives",
-            questions: [
-                {
-                    id: 'q1_calc_der',
-                    text: 'What does the derivative of a function represent?',
-                    type: 'multiple-choice',
-                    options: [
-                      { id: 'opt1_q1cd', text: 'Area under the curve' },
-                      { id: 'opt2_q1cd', text: 'The sum of its values' },
-                      { id: 'opt3_q1cd', text: 'Instantaneous rate of change' },
-                      { id: 'opt4_q1cd', text: 'The highest point of the function' },
-                    ],
-                    correctOptionId: 'opt3_q1cd',
-                  }
-            ]
-        }
+      {
+        topicId: "calc_derivatives",
+        topicName: "Derivadas", // Already in Portuguese, no change needed
+        questions: [
+          {
+            id: 'q1_calc_der',
+            text: 'O que a derivada de uma função representa?', // Translated from 'What does the derivative of a function represent?'
+            type: 'multiple-choice',
+            options: [
+              { id: 'opt1_q1cd', text: 'Área sob a curva' }, // Translated from 'Area under the curve'
+              { id: 'opt2_q1cd', text: 'A soma de seus valores' }, // Translated from 'The sum of its values'
+              { id: 'opt3_q1cd', text: 'Taxa de variação instantânea' }, // Translated from 'Instantaneous rate of change'
+              { id: 'opt4_q1cd', text: 'O ponto mais alto da função' }, // Translated from 'The highest point of the function'
+            ],
+            correctOptionId: 'opt3_q1cd',
+          }
+        ]
+      }
     ]
   },
   'engineering-data': {
-    subjectName: "Engineering Data",
+    subjectName: "Dados de Engenharia", // Translated from "Engineering Data"
     topics: [
-        {
-            topicId: "eng_data_basics",
-            topicName: "Basic Statistics",
-            questions: [
-                 {
-                    id: 'q1_engd_basics',
-                    text: 'What is the "mean" of a dataset?',
-                    type: 'multiple-choice',
-                    options: [
-                      { id: 'opt1_q1edb', text: 'The most frequent value' },
-                      { id: 'opt2_q1edb', text: 'The middle value' },
-                      { id: 'opt3_q1edb', text: 'The average value' },
-                      { id: 'opt4_q1edb', text: 'The difference between max and min' },
-                    ],
-                    correctOptionId: 'opt3_q1edb',
-                  }
-            ]
-        }
+      {
+        topicId: "eng_data_basics",
+        topicName: "Estatísticas Básicas", // Translated from "Basic Statistics"
+        questions: [
+          {
+            id: 'q1_engd_basics',
+            text: 'O que é a "média" de um conjunto de dados?', // Translated from 'What is the "mean" of a dataset?'
+            type: 'multiple-choice',
+            options: [
+              { id: 'opt1_q1edb', text: 'O valor mais frequente' }, // Translated from 'The most frequent value'
+              { id: 'opt2_q1edb', text: 'O valor do meio' }, // Translated from 'The middle value'
+              { id: 'opt3_q1edb', text: 'O valor médio' }, // Translated from 'The average value'
+              { id: 'opt4_q1edb', text: 'A diferença entre o máximo e o mínimo' }, // Translated from 'The difference between max and min'
+            ],
+            correctOptionId: 'opt3_q1edb',
+          }
+        ]
+      }
     ]
   }
 };

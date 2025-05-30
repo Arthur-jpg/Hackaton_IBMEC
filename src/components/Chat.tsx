@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Send, Bot, User } from 'lucide-react';
-import { marked } from 'marked'; // You'll need to install this package
+import { marked } from 'marked'; // Você precisará instalar este pacote
 
 interface ChatProps {
   subjectId: string | undefined;
@@ -14,14 +14,14 @@ interface Message {
   text: string;
   sender: 'user' | 'bot';
   timestamp: Date;
-  rawText?: string; // For storing original markdown
+  rawText?: string; // Para armazenar o markdown original
 }
 
 const subjectNames: Record<string, string> = {
-  electronics: 'Electronics',
-  'software-development': 'Software Development',
-  calculus: 'Calculus I',
-  'engineering-data': 'Engineering Data'
+  electronics: 'Eletrônica', // Translated
+  'software-development': 'Desenvolvimento de Software', // Translated
+  calculus: 'Cálculo I', // Translated
+  'engineering-data': 'Dados de Engenharia' // Translated
 };
 
 // General webhook endpoint
@@ -29,25 +29,23 @@ const WEBHOOK_URL = 'https://n8n.arthurschiller.com.br/webhook/e885d569-93ad-424
 
 const Chat = ({ subjectId }: ChatProps) => {
   const [messages, setMessages] = useState<Message[]>(() => {
-    // Tenta recuperar as mensagens do localStorage
     const savedMessages = localStorage.getItem(`chat_history_${subjectId}`);
     if (savedMessages) {
       try {
-        // Converte as datas de string para objeto Date
         const parsedMessages = JSON.parse(savedMessages);
         return parsedMessages.map((msg: any) => ({
           ...msg,
           timestamp: new Date(msg.timestamp)
         }));
       } catch (e) {
-        console.error("Erro ao carregar histórico de chat:", e);
+        console.error("Erro ao carregar histórico de chat:", e); // Already in PT
       }
     }
-    // Se não existir histórico ou ocorrer um erro, retorna a mensagem inicial
+    const currentSubjectName = subjectNames[subjectId || 'electronics'] || 'Eletrônica';
     return [
       {
         id: 1,
-        text: `Hello! I'm your ${subjectNames[subjectId || 'electronics']} study assistant. How can I help you today?`,
+        text: `Olá! Sou seu assistente de estudos de ${currentSubjectName}. Como posso te ajudar hoje?`, // Translated
         sender: 'bot',
         timestamp: new Date()
       }
@@ -56,13 +54,11 @@ const Chat = ({ subjectId }: ChatProps) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const chatBodyRef = useRef<HTMLDivElement>(null);
-  // Scroll to bottom when new messages arrive
+
   useEffect(() => {
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
-    
-    // Salvar mensagens no localStorage sempre que houver alterações
     if (messages.length > 0) {
       localStorage.setItem(`chat_history_${subjectId}`, JSON.stringify(messages));
     }
@@ -81,9 +77,8 @@ const Chat = ({ subjectId }: ChatProps) => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
-    
+
     try {
-      // Send request to webhook
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: {
@@ -97,36 +92,33 @@ const Chat = ({ subjectId }: ChatProps) => {
       });
 
       const data = await response.json();
-      const botResponseText = data.output || "I'm sorry, I couldn't process your request.";
-      
-      // Parse markdown to HTML
+      const botResponseText = data.output || "Desculpe, não consegui processar sua solicitação."; // Translated
+
       let formattedText;
       try {
         formattedText = marked(botResponseText);
       } catch (error) {
-        console.error("Markdown parsing error:", error);
+        console.error("Erro ao processar Markdown:", error); // Translated "Markdown parsing error"
         formattedText = botResponseText;
       }
 
       const botResponse: Message = {
-        id: messages.length + 2,
+        id: messages.length + 2, // Note: this might cause ID collisions if multiple messages are sent fast. Consider a UUID or a more robust ID generation.
         text: formattedText,
-        rawText: botResponseText, // Store original markdown
+        rawText: botResponseText,
         sender: 'bot',
         timestamp: new Date()
       };
-      
       setMessages(prev => [...prev, botResponse]);
     } catch (error) {
-      console.error("API error:", error);
-      
+      console.error("Erro na API:", error); // Translated "API error"
+
       const errorResponse: Message = {
-        id: messages.length + 2,
-        text: "Sorry, I couldn't connect to the server. Please try again later.",
+        id: messages.length + 2, // Same ID collision note applies
+        text: "Desculpe, não consegui conectar ao servidor. Por favor, tente novamente mais tarde.", // Translated
         sender: 'bot',
         timestamp: new Date()
       };
-      
       setMessages(prev => [...prev, errorResponse]);
     } finally {
       setIsLoading(false);
@@ -139,13 +131,15 @@ const Chat = ({ subjectId }: ChatProps) => {
     }
   };
 
+  const currentSubjectName = subjectNames[subjectId || 'electronics'] || 'Eletrônica';
+
   return (
     <div className="h-full flex flex-col p-8">
       <div className="mb-6 animate-fade-in">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-          {subjectNames[subjectId || 'electronics']} Assistant
+          Assistente de {currentSubjectName} {/* Translated */}
         </h1>
-        <p className="text-gray-600">Ask questions about {subjectNames[subjectId || 'electronics']} and get instant help!</p>
+        <p className="text-gray-600">Faça perguntas sobre {currentSubjectName} e obtenha ajuda instantânea!</p> {/* Translated */}
       </div>
 
       <Card className="flex-1 bg-white/70 backdrop-blur-sm shadow-lg border-0 flex flex-col">
@@ -159,8 +153,8 @@ const Chat = ({ subjectId }: ChatProps) => {
                 }`}
               >
                 <div className={`p-2 rounded-full ${
-                  message.sender === 'user' 
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-500' 
+                  message.sender === 'user'
+                    ? 'bg-gradient-to-r from-purple-500 to-blue-500'
                     : 'bg-gradient-to-r from-green-400 to-emerald-500'
                 }`}>
                   {message.sender === 'user' ? (
@@ -173,14 +167,14 @@ const Chat = ({ subjectId }: ChatProps) => {
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                     message.sender === 'user'
                       ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-800'
+                                            : 'bg-gray-100 text-gray-800'
                   }`}
                 >
                   {message.sender === 'user' ? (
                     <p className="text-sm">{message.text}</p>
                   ) : (
-                    <div 
-                      className="text-sm message-content" 
+                    <div
+                      className="text-sm message-content"
                       dangerouslySetInnerHTML={{ __html: message.text }}
                     />
                   )}
@@ -215,7 +209,7 @@ const Chat = ({ subjectId }: ChatProps) => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask a question..."
+              placeholder="Faça uma pergunta..." // Translated
               disabled={isLoading}
               className="flex-1 bg-white/50 backdrop-blur-sm border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
@@ -229,7 +223,6 @@ const Chat = ({ subjectId }: ChatProps) => {
           </div>
         </CardContent>
       </Card>
-        {/* Optional: Add some CSS for the typing indicator */}
       <style>{`
         .typing-indicator {
           display: inline-flex;

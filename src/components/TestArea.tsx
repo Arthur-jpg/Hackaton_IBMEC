@@ -1,15 +1,15 @@
 // src/components/TestArea.tsx
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card'; //
-import { Button } from '@/components/ui/button'; //
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'; //
-import { Label } from '@/components/ui/label'; //
-import { Progress } from '@/components/ui/progress'; //
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'; //
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; //
-import { testData, Question as TestQuestion, TopicTest, SubjectTests } from '@/lib/testData';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { testData, Question as TestQuestion, TopicTest, SubjectTests } from '@/lib/testData'; // Assuming testData itself is translated where needed
 import { CheckCircle, XCircle, RotateCcw, ArrowLeft, ArrowRight, Award, ListChecks, BarChart3 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast'; //
+import { useToast } from '@/hooks/use-toast';
 
 interface TestAreaProps {
   subjectId: string | undefined;
@@ -25,7 +25,7 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
   const [currentSubjectData, setCurrentSubjectData] = useState<SubjectTests | null>(null);
   const [availableTopics, setAvailableTopics] = useState<TopicTest[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<TopicTest | null>(null);
-  
+
   const [currentQuestions, setCurrentQuestions] = useState<TestQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
@@ -39,16 +39,15 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
     return `testGrade_${sId}_${tId}`;
   }, []);
 
-  // Load subject and topic data
   useEffect(() => {
-    const SId = subjectId || 'electronics'; // Default subject
+    const SId = subjectId || 'electronics';
     const subjectTestData = testData[SId];
     if (subjectTestData) {
       setCurrentSubjectData(subjectTestData);
       setAvailableTopics(subjectTestData.topics);
-      setSelectedTopic(null); // Reset selected topic when subject changes
-      setCurrentQuestions([]); // Reset questions
-      setShowResults(false); // Hide results
+      setSelectedTopic(null);
+      setCurrentQuestions([]);
+      setShowResults(false);
     } else {
       setCurrentSubjectData(null);
       setAvailableTopics([]);
@@ -57,7 +56,6 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
     }
   }, [subjectId]);
 
-  // Load last grade when a topic is selected
   useEffect(() => {
     if (subjectId && selectedTopic) {
       const gradeKey = getGradeLocalStorageKey(subjectId, selectedTopic.topicId);
@@ -67,7 +65,6 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
       } else {
         setLastGrade(null);
       }
-      // Reset test state for the new topic
       setCurrentQuestions(selectedTopic.questions);
       setCurrentQuestionIndex(0);
       setUserAnswers({});
@@ -75,7 +72,6 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
       setScore(0);
     }
   }, [selectedTopic, subjectId, getGradeLocalStorageKey]);
-
 
   const currentQuestion = useMemo(() => {
     return currentQuestions[currentQuestionIndex];
@@ -102,11 +98,11 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
         date: new Date().toISOString(),
     };
     localStorage.setItem(getGradeLocalStorageKey(subjectId, selectedTopic.topicId), JSON.stringify(newGrade));
-    setLastGrade(newGrade); // Update last grade displayed
+    setLastGrade(newGrade);
 
     toast({
-        title: "Test Submitted!",
-        description: `You scored ${calculatedScore} out of ${currentQuestions.length}.`,
+        title: "Teste Enviado!", // Translated
+        description: `Você acertou ${calculatedScore} de ${currentQuestions.length}.`, // Translated
     });
   };
 
@@ -116,12 +112,12 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
       setSelectedTopic(topic);
     }
   };
-  
+
   const handleGoToTopicSelection = () => {
     setSelectedTopic(null);
     setCurrentQuestions([]);
     setShowResults(false);
-    setLastGrade(null); // Clear last grade when going back to topic selection
+    setLastGrade(null);
   };
 
   const progressPercentage = currentQuestions.length > 0 ? ((currentQuestionIndex + 1) / currentQuestions.length) * 100 : 0;
@@ -129,125 +125,123 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
   if (!currentSubjectData) {
     return (
       <div className="p-8 max-w-3xl mx-auto">
-        <Alert variant="destructive"><AlertTitle>No Test Data</AlertTitle><AlertDescription>Test data for this subject is not available.</AlertDescription></Alert>
+        <Alert variant="destructive">
+          <AlertTitle>Sem Dados de Teste</AlertTitle> {/* Translated */}
+          <AlertDescription>Os dados de teste para esta matéria não estão disponíveis.</AlertDescription> {/* Translated */}
+        </Alert>
       </div>
     );
   }
 
-  // Topic Selection Screen
   if (!selectedTopic) {
     return (
       <div className="p-8 max-w-3xl mx-auto animate-fade-in">
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-2xl text-gray-800 mb-2 flex items-center">
-                <ListChecks className="mr-3 h-7 w-7 text-purple-600"/>
-                Select a Topic for Your Test
+              <ListChecks className="mr-3 h-7 w-7 text-purple-600"/>
+              Selecione um Tópico para o Seu Teste {/* Translated */}
             </CardTitle>
-            <CardDescription>{currentSubjectData.subjectName}</CardDescription>
+            <CardDescription>{currentSubjectData.subjectName}</CardDescription> {/* Assumes subjectName is already translated from testData */}
           </CardHeader>
           <CardContent className="space-y-4">
             {availableTopics.length > 0 ? availableTopics.map(topic => {
-                const gradeKey = getGradeLocalStorageKey(subjectId || 'electronics', topic.topicId);
-                const storedGrade = localStorage.getItem(gradeKey);
-                let topicLastGrade: LastGrade | null = null;
-                if (storedGrade) topicLastGrade = JSON.parse(storedGrade);
+              const gradeKey = getGradeLocalStorageKey(subjectId || 'electronics', topic.topicId);
+              const storedGrade = localStorage.getItem(gradeKey);
+              let topicLastGrade: LastGrade | null = null;
+              if (storedGrade) topicLastGrade = JSON.parse(storedGrade);
 
-                return (
-                    <Card key={topic.topicId} className="p-4 hover:shadow-md transition-shadow">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-700">{topic.topicName}</h3>
-                                <p className="text-sm text-gray-500">{topic.questions.length} questions</p>
-                                {topicLastGrade && (
-                                    <p className="text-xs text-blue-600 mt-1">
-                                        Last Grade: {topicLastGrade.score}/{topicLastGrade.totalQuestions} 
-                                        <span className="text-gray-400 ml-1">({new Date(topicLastGrade.date).toLocaleDateString()})</span>
-                                    </p>
-                                )}
-                            </div>
-                            <Button onClick={() => handleStartTest(topic.topicId)}>Start Test</Button>
-                        </div>
-                    </Card>
-                );
-            }) : <p className="text-gray-500">No topics available for this subject.</p>}
+              return (
+                <Card key={topic.topicId} className="p-4 hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-700">{topic.topicName}</h3> {/* Assumes topicName is already translated */}
+                      <p className="text-sm text-gray-500">{topic.questions.length} questões</p> {/* Translated "questions" */}
+                      {topicLastGrade && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          Última Nota: {topicLastGrade.score}/{topicLastGrade.totalQuestions} {/* Translated "Last Grade" */}
+                          <span className="text-gray-400 ml-1">({new Date(topicLastGrade.date).toLocaleDateString()})</span>
+                        </p>
+                      )}
+                    </div>
+                    <Button onClick={() => handleStartTest(topic.topicId)}>Iniciar Teste</Button> {/* Translated "Start Test" */}
+                  </div>
+                </Card>
+              );
+            }) : <p className="text-gray-500">Nenhum tópico disponível para esta matéria.</p>} {/* Translated */}
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Test Results Screen
   if (showResults) {
     return (
       <div className="p-8 max-w-3xl mx-auto animate-fade-in">
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-gray-800">Test Results</CardTitle>
-            <p className="text-gray-600">{selectedTopic.topicName} - {currentSubjectData.subjectName}</p>
+            <CardTitle className="text-3xl font-bold text-gray-800">Resultados do Teste</CardTitle> {/* Translated */}
+            <p className="text-gray-600">{selectedTopic.topicName} - {currentSubjectData.subjectName}</p> {/* Assumes names are translated */}
           </CardHeader>
           <CardContent className="text-center space-y-6">
-            {/* ... (Results display as before, ensure it uses score and currentQuestions.length) ... */}
             <div className="flex flex-col items-center">
-                <Award className="h-24 w-24 text-yellow-500 mb-4" />
-                <p className="text-5xl font-bold text-purple-600">
-                  {score} / {currentQuestions.length}
-                </p>
-                <p className="text-xl text-gray-700 mt-2">
-                  You answered {((score / currentQuestions.length) * 100).toFixed(0)}% correctly!
-                </p>
+              <Award className="h-24 w-24 text-yellow-500 mb-4" />
+              <p className="text-5xl font-bold text-purple-600">
+                {score} / {currentQuestions.length}
+              </p>
+              <p className="text-xl text-gray-700 mt-2">
+                Você acertou {((score / currentQuestions.length) * 100).toFixed(0)}% corretamente! {/* Translated */}
+              </p>
             </div>
             <div className="space-y-3 text-left max-h-80 overflow-y-auto p-1">
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Review Your Answers:</h3>
-                {currentQuestions.map((q, index) => (
-                    <div key={q.id} className={`p-3 rounded-md ${userAnswers[q.id] === q.correctOptionId ? 'bg-green-50 border-l-4 border-green-500' : 'bg-red-50 border-l-4 border-red-500'}`}>
-                        <p className="font-medium text-gray-800">{index + 1}. {q.text}</p>
-                        <p className="text-sm mt-1">
-                            Your answer: <span className="font-semibold">{q.options.find(opt => opt.id === userAnswers[q.id])?.text || "Not answered"}</span>
-                            {userAnswers[q.id] !== q.correctOptionId && (
-                                <span className="ml-2 text-green-700">(Correct: {q.options.find(opt => opt.id === q.correctOptionId)?.text})</span>
-                            )}
-                        </p>
-                    </div>
-                ))}
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">Revise Suas Respostas:</h3> {/* Translated */}
+              {currentQuestions.map((q, index) => (
+                <div key={q.id} className={`p-3 rounded-md ${userAnswers[q.id] === q.correctOptionId ? 'bg-green-50 border-l-4 border-green-500' : 'bg-red-50 border-l-4 border-red-500'}`}>
+                  <p className="font-medium text-gray-800">{index + 1}. {q.text}</p> {/* Assumes q.text is translated */}
+                  <p className="text-sm mt-1">
+                    Sua resposta: <span className="font-semibold">{q.options.find(opt => opt.id === userAnswers[q.id])?.text || "Não respondida"}</span> {/* Translated "Your answer", "Not answered". Assumes option text is translated */}
+                    {userAnswers[q.id] !== q.correctOptionId && (
+                      <span className="ml-2 text-green-700">(Correta: {q.options.find(opt => opt.id === q.correctOptionId)?.text})</span>
+                    )}
+                  </p>
+                </div>
+              ))}
             </div>
           </CardContent>
           <CardFooter className="justify-center space-x-3">
-            <Button variant="outline" onClick={handleGoToTopicSelection}> <ListChecks className="mr-2 h-4 w-4" /> Select Another Topic</Button>
+            <Button variant="outline" onClick={handleGoToTopicSelection}> <ListChecks className="mr-2 h-4 w-4" /> Selecionar Outro Tópico</Button> {/* Translated */}
             <Button onClick={() => { setSelectedTopic(null); handleStartTest(selectedTopic.topicId); }} className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
-              <RotateCcw className="mr-2 h-4 w-4" /> Retake This Test
+              <RotateCcw className="mr-2 h-4 w-4" /> Refazer Este Teste {/* Translated */}
             </Button>
           </CardFooter>
         </Card>
       </div>
     );
   }
-  
-  // Test Taking Screen
-  if (!currentQuestion) return <div className="p-8">Loading question...</div>;
+
+  if (!currentQuestion) return <div className="p-8">Carregando questão...</div>; {/* Translated */}
 
   return (
     <div className="p-8 max-w-3xl mx-auto animate-fade-in">
       <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
         <CardHeader>
           <Button variant="link" onClick={handleGoToTopicSelection} className="p-0 h-auto text-sm text-purple-600 hover:underline mb-2">
-            &larr; Back to Topic Selection
+            &larr; Voltar para Seleção de Tópicos {/* Translated */}
           </Button>
-          <CardTitle className="text-xl text-gray-800 mb-1">{selectedTopic.topicName} Test</CardTitle>
+          <CardTitle className="text-xl text-gray-800 mb-1">{selectedTopic.topicName} Teste</CardTitle> {/* Translated "Test". Assumes topicName translated */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-600">Question {currentQuestionIndex + 1} of {currentQuestions.length}</p>
+            <p className="text-sm text-gray-600">Questão {currentQuestionIndex + 1} de {currentQuestions.length}</p> {/* Translated "Question", "of" */}
             <Progress value={progressPercentage} className="w-1/3 h-2" />
           </div>
         </CardHeader>
         <CardContent className="space-y-6 min-h-[200px]">
-          {/* ... (Question display as before) ... */}
-           <p className="text-lg font-medium text-gray-700">{currentQuestion.text}</p>
+          <p className="text-lg font-medium text-gray-700">{currentQuestion.text}</p> {/* Assumes text translated */}
           <RadioGroup
             value={userAnswers[currentQuestion.id] || ''}
             onValueChange={handleAnswerSelect}
             className="space-y-3"
           >
-            {currentQuestion.options.map(option => (
+            {currentQuestion.options.map(option => ( // Assumes options text translated
               <div key={option.id} className="flex items-center space-x-3 p-3 bg-gray-50/50 hover:bg-gray-100/70 rounded-md transition-colors cursor-pointer has-[:checked]:bg-purple-50 has-[:checked]:border-purple-400 border border-transparent">
                 <RadioGroupItem value={option.id} id={option.id} />
                 <Label htmlFor={option.id} className="text-gray-700 flex-1 cursor-pointer">{option.text}</Label>
@@ -256,42 +250,41 @@ const TestArea: React.FC<TestAreaProps> = ({ subjectId }) => {
           </RadioGroup>
         </CardContent>
         <CardFooter className="flex justify-between">
-          {/* ... (Navigation buttons as before) ... */}
           <Button
             variant="outline"
             onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
             disabled={currentQuestionIndex === 0}
             className="hover:bg-gray-100/70"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+            <ArrowLeft className="mr-2 h-4 w-4" /> Anterior {/* Translated */}
           </Button>
           {currentQuestionIndex < currentQuestions.length - 1 ? (
             <Button
               onClick={() => setCurrentQuestionIndex(prev => Math.min(currentQuestions.length - 1, prev + 1))}
               className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
             >
-              Next <ArrowRight className="ml-2 h-4 w-4" />
+              Próxima <ArrowRight className="ml-2 h-4 w-4" /> {/* Translated "Next" */}
             </Button>
           ) : (
-            <Button 
-                onClick={handleSubmitTest}
-                disabled={Object.keys(userAnswers).length !== currentQuestions.length} // Ensure all questions are answered
-                className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+            <Button
+              onClick={handleSubmitTest}
+              disabled={Object.keys(userAnswers).length !== currentQuestions.length}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
             >
-              <CheckCircle className="mr-2 h-4 w-4" /> Submit Test
+              <CheckCircle className="mr-2 h-4 w-4" /> Enviar Teste {/* Translated */}
             </Button>
           )}
         </CardFooter>
       </Card>
-       {lastGrade && !showResults && (
-            <Alert className="mt-6 bg-blue-50 border-blue-300 text-blue-700">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
-                <AlertTitle className="font-semibold">Your Last Attempt on this Topic</AlertTitle>
-                <AlertDescription>
-                    You scored {lastGrade.score}/{lastGrade.totalQuestions} on {new Date(lastGrade.date).toLocaleDateString()}.
-                </AlertDescription>
-            </Alert>
-        )}
+      {lastGrade && !showResults && (
+        <Alert className="mt-6 bg-blue-50 border-blue-300 text-blue-700">
+          <BarChart3 className="h-5 w-5 text-blue-600" />
+          <AlertTitle className="font-semibold">Sua Última Tentativa neste Tópico</AlertTitle> {/* Translated */}
+          <AlertDescription>
+            Você acertou {lastGrade.score}/{lastGrade.totalQuestions} em {new Date(lastGrade.date).toLocaleDateString()}. {/* Translated "You scored", "on" */}
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };

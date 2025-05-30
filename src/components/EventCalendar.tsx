@@ -1,48 +1,55 @@
-// src/components/EventCalendar.tsx
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Calendar } from '@/components/ui/calendar'; //
-import { Button } from '@/components/ui/button'; //
-import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card'; //
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose } from '@/components/ui/dialog'; //
-import { Input } from '@/components/ui/input'; //
-import { Textarea } from '@/components/ui/textarea'; //
-import { Label } from '@/components/ui/label'; //
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'; //
-import { useToast } from '@/hooks/use-toast'; //
+import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 import { PlusCircle, Trash2, Edit3, CalendarDays, X } from 'lucide-react';
-import { format, parseISO, isValid, startOfDay } from 'date-fns'; // For date manipulation
+import { format, parseISO, isValid, startOfDay } from 'date-fns';
+import { ptBR } from 'date-fns/locale'; // Import pt-BR locale for date formatting
 
 interface CalendarEvent {
   id: string;
   date: string; // YYYY-MM-DD
   title: string;
   description?: string;
-  type?: 'Exam' | 'Assignment' | 'Study Session' | 'Other';
+  type?: 'Exam' | 'Assignment' | 'Study Session' | 'Other'; // Types can be translated if they appear directly in UI, or map to translated values
 }
 
 const LOCAL_STORAGE_EVENTS_KEY = 'studyHubCalendarEvents';
+
+// Helper for event type translation if needed (can be expanded)
+const eventTypeTranslations: Record<NonNullable<CalendarEvent['type']>, string> = {
+    'Exam': 'Prova',
+    'Assignment': 'Entrega de Trabalho',
+    'Study Session': 'Sessão de Estudo',
+    'Other': 'Outro'
+};
+
 
 const EventCalendar: React.FC = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
-  const [currentEvent, setCurrentEvent] = useState<Partial<CalendarEvent> | null>(null); // For add/edit
+  const [currentEvent, setCurrentEvent] = useState<Partial<CalendarEvent> | null>(null);
   const { toast } = useToast();
 
-  // Load events from localStorage
   useEffect(() => {
     const storedEvents = localStorage.getItem(LOCAL_STORAGE_EVENTS_KEY);
     if (storedEvents) {
       try {
         setEvents(JSON.parse(storedEvents));
       } catch (e) {
-        console.error("Failed to parse events from localStorage", e);
+        console.error("Falha ao analisar eventos do localStorage", e); // Translated
         setEvents([]);
       }
     }
   }, []);
 
-  // Save events to localStorage
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_EVENTS_KEY, JSON.stringify(events));
   }, [events]);
@@ -57,28 +64,26 @@ const EventCalendar: React.FC = () => {
     } else if (selectedDate) {
       setCurrentEvent({ date: format(selectedDate, 'yyyy-MM-dd'), title: '', type: 'Other' });
     } else {
-        // If no date selected, default to today for new event
-        setCurrentEvent({ date: format(new Date(), 'yyyy-MM-dd'), title: '', type: 'Other' });
+      setCurrentEvent({ date: format(new Date(), 'yyyy-MM-dd'), title: '', type: 'Other' });
     }
     setIsEventDialogOpen(true);
   };
 
   const handleSaveEvent = () => {
     if (!currentEvent || !currentEvent.title || !currentEvent.date) {
-      toast({ title: "Missing Information", description: "Please provide a title and date for the event.", variant: "destructive" });
+      toast({ title: "Informações Faltando", description: "Por favor, forneça um título e data para o evento.", variant: "destructive" }); // Translated
       return;
     }
-    
+
     const targetDate = parseISO(currentEvent.date);
     if (!isValid(targetDate)) {
-        toast({ title: "Invalid Date", description: "The event date is not valid.", variant: "destructive" });
+        toast({ title: "Data Inválida", description: "A data do evento não é válida.", variant: "destructive" }); // Translated
         return;
     }
-    // Ensure date is stored consistently (start of day in UTC might be safer, but YYYY-MM-DD string is fine for this)
     const eventToSave: CalendarEvent = {
         id: currentEvent.id || Date.now().toString(),
         title: currentEvent.title,
-        date: currentEvent.date, // Already in YYYY-MM-DD from form
+        date: currentEvent.date,
         description: currentEvent.description,
         type: currentEvent.type || 'Other',
     };
@@ -93,14 +98,14 @@ const EventCalendar: React.FC = () => {
       return [...prevEvents, eventToSave];
     });
 
-    toast({ title: "Event Saved!", description: `"${eventToSave.title}" has been saved.` });
+    toast({ title: "Evento Salvo!", description: `"${eventToSave.title}" foi salvo.` }); // Translated
     setIsEventDialogOpen(false);
     setCurrentEvent(null);
   };
 
   const handleDeleteEvent = (eventId: string) => {
     setEvents(prevEvents => prevEvents.filter(e => e.id !== eventId));
-    toast({ title: "Event Deleted!", variant: "destructive" });
+    toast({ title: "Evento Excluído!", variant: "destructive" }); // Translated
   };
 
   const eventsOnSelectedDate = useMemo(() => {
@@ -110,34 +115,16 @@ const EventCalendar: React.FC = () => {
   }, [events, selectedDate]);
 
   const datesWithEvents = useMemo(() => {
-    return events.map(event => startOfDay(parseISO(event.date))); // Ensure we compare dates correctly
+    return events.map(event => startOfDay(parseISO(event.date)));
   }, [events]);
 
   const eventDayModifier = { hasEvent: datesWithEvents };
-  const eventDayModifierStyles = {
-    hasEvent: {
-      position: 'relative' as React.CSSProperties['position'],
-       '&::after': { 
-        content: '""',
-        display: 'block',
-        position: 'absolute' as React.CSSProperties['position'],
-        left: '50%',
-        bottom: '4px',
-        transform: 'translateX(-50%)',
-        width: '5px',
-        height: '5px',
-        borderRadius: '50%',
-        backgroundColor: 'hsl(var(--primary))',
-      }
-    }
-  };
-   const calendarModifiersStyles = {
+  const calendarModifiersStyles = {
     hasEvent: {
       fontWeight: "bold",
-      color: "hsl(var(--primary))" 
+      color: "hsl(var(--primary))"
     }
   };
-
 
   return (
     <Card className="w-full shadow-xl border-0 bg-white/80 backdrop-blur-sm animate-fade-in">
@@ -145,71 +132,71 @@ const EventCalendar: React.FC = () => {
         <div className="flex justify-between items-center">
             <CardTitle className="text-2xl font-bold text-gray-800 flex items-center">
                 <CalendarDays className="mr-3 h-7 w-7 text-purple-600"/>
-                Event Calendar
+                Calendário de Eventos {/* Translated */}
             </CardTitle>
             <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
                 <DialogTrigger asChild>
                     <Button onClick={() => openEventDialog()} className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
-                        <PlusCircle className="mr-2 h-4 w-4" /> Add Event
+                        <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Evento {/* Translated */}
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[480px]">
                     <DialogHeader>
-                    <DialogTitle>{currentEvent?.id ? 'Edit Event' : 'Add New Event'}</DialogTitle>
+                    <DialogTitle>{currentEvent?.id ? 'Editar Evento' : 'Adicionar Novo Evento'}</DialogTitle> {/* Translated */}
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="event-title" className="text-right">Title</Label>
-                        <Input 
-                            id="event-title" 
-                            value={currentEvent?.title || ''} 
+                        <Label htmlFor="event-title" className="text-right">Título</Label> {/* Translated */}
+                        <Input
+                            id="event-title"
+                            value={currentEvent?.title || ''}
                             onChange={(e) => setCurrentEvent(prev => ({...prev, title: e.target.value}))}
-                            className="col-span-3" 
+                            className="col-span-3"
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="event-date" className="text-right">Date</Label>
-                        <Input 
-                            id="event-date" 
-                            type="date" 
-                            value={currentEvent?.date || ''} 
+                        <Label htmlFor="event-date" className="text-right">Data</Label> {/* Translated */}
+                        <Input
+                            id="event-date"
+                            type="date"
+                            value={currentEvent?.date || ''}
                             onChange={(e) => setCurrentEvent(prev => ({...prev, date: e.target.value}))}
-                            className="col-span-3" 
+                            className="col-span-3"
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="event-type" className="text-right">Type</Label>
-                        <Select 
+                        <Label htmlFor="event-type" className="text-right">Tipo</Label> {/* Translated */}
+                        <Select
                             value={currentEvent?.type || 'Other'}
                             onValueChange={(value) => setCurrentEvent(prev => ({...prev, type: value as CalendarEvent['type']}))}
                         >
                             <SelectTrigger className="col-span-3">
-                                <SelectValue placeholder="Select event type" />
+                                <SelectValue placeholder="Selecione o tipo de evento" /> {/* Translated */}
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="Exam">Exam</SelectItem>
-                                <SelectItem value="Assignment">Assignment Due</SelectItem>
-                                <SelectItem value="Study Session">Study Session</SelectItem>
-                                <SelectItem value="Other">Other</SelectItem>
+                                <SelectItem value="Exam">{eventTypeTranslations['Exam']}</SelectItem> {/* Translated */}
+                                <SelectItem value="Assignment">{eventTypeTranslations['Assignment']}</SelectItem> {/* Translated */}
+                                <SelectItem value="Study Session">{eventTypeTranslations['Study Session']}</SelectItem> {/* Translated */}
+                                <SelectItem value="Other">{eventTypeTranslations['Other']}</SelectItem> {/* Translated */}
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="event-description" className="text-right">Description</Label>
-                        <Textarea 
-                            id="event-description" 
+                        <Label htmlFor="event-description" className="text-right">Descrição</Label> {/* Translated */}
+                        <Textarea
+                            id="event-description"
                             value={currentEvent?.description || ''}
                             onChange={(e) => setCurrentEvent(prev => ({...prev, description: e.target.value}))}
-                            className="col-span-3 min-h-[80px]" 
-                            placeholder="(Optional)"
+                            className="col-span-3 min-h-[80px]"
+                            placeholder="(Opcional)" // Translated
                         />
                     </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">Cancelar</Button> {/* Translated */}
                         </DialogClose>
-                        <Button onClick={handleSaveEvent}>Save Event</Button>
+                        <Button onClick={handleSaveEvent}>Salvar Evento</Button> {/* Translated */}
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -222,13 +209,14 @@ const EventCalendar: React.FC = () => {
                 selected={selectedDate}
                 onSelect={handleDateSelect}
                 className="rounded-md border p-3 bg-white/50"
-                modifiers={eventDayModifier} // For marking days
-                modifiersStyles={calendarModifiersStyles} // For styling marked days
+                modifiers={eventDayModifier}
+                modifiersStyles={calendarModifiersStyles}
+                locale={ptBR} // Added locale for calendar month/day names
             />
         </div>
         <div className="flex-1 w-full mt-6 md:mt-0">
           <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
-            Events for: {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'No date selected'}
+            Eventos para: {selectedDate ? format(selectedDate, 'd \'de\' MMMM \'de\' yyyy', { locale: ptBR }) : 'Nenhuma data selecionada'} {/* Translated "Events for", "No date selected", and used ptBR locale for date format */}
           </h3>
           {eventsOnSelectedDate.length > 0 ? (
             <ul className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
@@ -241,7 +229,7 @@ const EventCalendar: React.FC = () => {
                             event.type === 'Assignment' ? 'bg-blue-500' :
                             event.type === 'Study Session' ? 'bg-green-500' : 'bg-gray-500'
                         }`}>
-                            {event.type}
+                            {eventTypeTranslations[event.type || 'Other']} {/* Display translated type */}
                         </span>
                         <h4 className="font-medium text-gray-800 mt-1">{event.title}</h4>
                         {event.description && <p className="text-sm text-gray-600 mt-1">{event.description}</p>}
@@ -259,7 +247,7 @@ const EventCalendar: React.FC = () => {
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 text-sm">No events for this date.</p>
+            <p className="text-gray-500 text-sm">Nenhum evento para esta data.</p>
           )}
         </div>
       </CardContent>
