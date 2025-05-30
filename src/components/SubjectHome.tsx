@@ -57,32 +57,7 @@ const subjectData: Record<string, any> = {
 
 const SubjectHome = ({ subjectId }: SubjectHomeProps) => {
   const subject = subjectData[subjectId || ''] || subjectData.electronics;
-  /*
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'in-progress':
-        return <Clock className="h-5 w-5 text-blue-500" />;
-      default:
-        return <BookOpen className="h-5 w-5 text-gray-400" />;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, string> = {
-      completed: 'bg-green-100 text-green-800',
-      'in-progress': 'bg-blue-100 text-blue-800',
-      'not-started': 'bg-gray-100 text-gray-600'
-    };
-    
-    return variants[status] || variants['not-started'];
-  };
-
-  const overallProgress = Math.round(
-    subject.topics.reduce((sum: number, topic: any) => sum + topic.progress, 0) / subject.topics.length
-  );
-  */
+  
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="mb-8 animate-fade-in">

@@ -1,10 +1,16 @@
-
+// src/pages/Dashboard.tsx
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Calculator, Code, Zap, User, LogOut } from 'lucide-react';
+import { User, LogOut } from 'lucide-react'; 
+import EventCalendar from '@/components/EventCalendar'; 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-const subjects = [
+const Zap = ({ className = "" }: { className?: string }) => <svg className={className} />;
+const Code = ({ className = "" }: { className?: string }) => <svg className={className} />;
+const Calculator = ({ className = "" }: { className?: string }) => <svg className={className} />;
+const BookOpen = ({ className = "" }: { className?: string }) => <svg className={className} />;
+
+const subjects = [ 
   {
     id: 'electronics',
     name: 'Electronics',
@@ -35,78 +41,67 @@ const subjects = [
   },
 ];
 
+
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const handleSubjectSelect = (subjectId: string) => {
-    navigate(`/subject/${subjectId}`);
-  };
-
   const handleLogout = () => {
-    navigate('/');
+    navigate('/'); //
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
           <div className="animate-fade-in">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Welcome back, Hudson! 👋
             </h1>
-            <p className="text-gray-600 mt-2">Ready to continue your learning journey?</p>
+            <p className="text-gray-600 mt-1 md:mt-2">Manage your schedule and important dates.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-sm rounded-full px-4 py-2">
-              <User className="h-5 w-5 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Hudson Student</span>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2">
+              <User className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+              <span className="text-xs sm:text-sm font-medium text-gray-700">Hudson Student</span>
             </div>
             <Button
               onClick={handleLogout}
               variant="outline"
               size="sm"
-              className="bg-white/70 backdrop-blur-sm hover:bg-white/90"
+              className="bg-white/70 backdrop-blur-sm hover:bg-white/90 text-xs sm:text-sm"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Logout
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {subjects.map((subject, index) => {
-            const Icon = subject.icon;
-            return (
-              <Card
-                key={subject.id}
-                className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl bg-white/70 backdrop-blur-sm border-0 animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-                onClick={() => handleSubjectSelect(subject.id)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className={`bg-gradient-to-r ${subject.color} p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-200`}>
-                      <Icon className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors">
-                        {subject.name}
-                      </h3>
-                      <p className="text-gray-600 text-sm mb-4">{subject.description}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="mb-10">
+          <EventCalendar />
         </div>
 
-        <div className="mt-12 text-center animate-fade-in" style={{ animationDelay: '400ms' }}>
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 inline-block">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Keep up the great work! 🌟</h3>
-            <p className="text-gray-600">You're making excellent progress across all subjects.</p>
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">Your Subjects</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {subjects.map((subject) => {
+                const IconComponent = subject.icon;
+                return (
+                    <Card key={subject.id} className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 bg-white/70 backdrop-blur-sm border-0" onClick={() => navigate(`/subject/${subject.id}`)}>
+                        <CardHeader>
+                            <div className={`p-3 rounded-lg inline-block bg-gradient-to-r ${subject.color}`}>
+                                <IconComponent className="h-6 w-6 text-white" />
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <CardTitle className="text-md font-semibold text-gray-800 group-hover:text-purple-600">{subject.name}</CardTitle>
+                            <CardDescription className="text-xs text-gray-500 mt-1">{subject.description}</CardDescription>
+                        </CardContent>
+                    </Card>
+                );
+            })}
           </div>
         </div>
+
       </div>
     </div>
   );
