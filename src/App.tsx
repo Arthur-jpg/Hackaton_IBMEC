@@ -1,20 +1,21 @@
 // src/App.tsx
 import React, { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
-import { Toaster } from "@/components/ui/toaster"; //
-import { Toaster as SonnerToaster, toast } from "@/components/ui/sonner";  //
-import { TooltipProvider } from "@/components/ui/tooltip";  //
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";  //
-import { BrowserRouter, Routes, Route } from "react-router-dom";  //
-import Login from "./pages/Login";  //
-import Dashboard from "./pages/Dashboard";  //
-import SubjectHub from "./pages/SubjectHub";  //
-import NotFound from "./pages/NotFound";  //
-import CreateAccount from "./pages/CreateAccount"; //
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster, toast } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import MainLayout from './components/MainLayout'; // Import the new layout
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import SubjectHub from "./pages/SubjectHub";
+import NotFound from "./pages/NotFound";
+import CreateAccount from "./pages/CreateAccount";
+import MainLayout from './components/MainLayout';
 import ProfilePage from './pages/ProfilePage';
 
-// PomodoroContext and related code remains the same
+import { AuthProvider } from './components/contexts/authContext'; // ✅ Importado corretamente
+
 interface PomodoroContextType {
   pomodoroTime: number;
   isPomodoroRunning: boolean;
@@ -37,13 +38,13 @@ export const usePomodoro = (): PomodoroContextType => {
 const queryClient = new QueryClient();
 
 const App = () => {
-  const WORK_DURATION = 0.1 * 60; 
-  const BREAK_DURATION = 1 * 60;  
+  const WORK_DURATION = 0.1 * 60;
+  const BREAK_DURATION = 1 * 60;
 
   const [pomodoroTime, setPomodoroTime] = useState(WORK_DURATION);
   const [isPomodoroRunning, setIsPomodoroRunning] = useState(false);
   const [isPomodoroBreak, setIsPomodoroBreak] = useState(false);
- 
+
   useEffect(() => {
     let intervalId: NodeJS.Timeout | undefined = undefined;
     if (isPomodoroRunning && pomodoroTime > 0) {
@@ -57,14 +58,14 @@ const App = () => {
         toast.info(nextIsBreak ? "Time for a break! 🧘" : "Back to focus! 🚀");
         return nextIsBreak;
       });
-      setIsPomodoroRunning(true); 
+      setIsPomodoroRunning(true);
     }
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
       }
     };
-  }, [isPomodoroRunning, pomodoroTime]); 
+  }, [isPomodoroRunning, pomodoroTime]);
 
   const togglePomodoro = useCallback(() => {
     setIsPomodoroRunning((prevIsRunning) => !prevIsRunning);
@@ -72,7 +73,7 @@ const App = () => {
 
   const resetPomodoro = useCallback(() => {
     setIsPomodoroRunning(false);
-    setIsPomodoroBreak(false); 
+    setIsPomodoroBreak(false);
     setPomodoroTime(WORK_DURATION);
   }, [WORK_DURATION]);
 
@@ -96,35 +97,34 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <SonnerToaster richColors position="top-right" />
-        <PomodoroContext.Provider value={pomodoroContextValue}>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/create-account" element={<CreateAccount />} />
-
-              <Route 
-                path="/dashboard" 
-                element={
-                  <MainLayout>
-                    <Dashboard />
-                  </MainLayout>
-                } 
-              />
-              <Route 
-                path="/subject/:subjectId" 
-                element={
-                  <MainLayout>
-                    <SubjectHub />
-                  </MainLayout>
-                } 
-              />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="*" element={<NotFound />} /> 
-            </Routes>
-          </BrowserRouter>
-        </PomodoroContext.Provider>
-        
-
+        <AuthProvider> {/* ✅ Adicionado o AuthProvider aqui */}
+          <PomodoroContext.Provider value={pomodoroContextValue}>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/create-account" element={<CreateAccount />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <MainLayout>
+                      <Dashboard />
+                    </MainLayout>
+                  }
+                />
+                <Route
+                  path="/subject/:subjectId"
+                  element={
+                    <MainLayout>
+                      <SubjectHub />
+                    </MainLayout>
+                  }
+                />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </PomodoroContext.Provider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
