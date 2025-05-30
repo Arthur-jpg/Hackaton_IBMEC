@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -32,30 +32,32 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-3 rounded-full">
-              <BookOpen className="h-8 w-8 text-white" />
+        {/* ... existing header ... */}
+         <div className="text-center mb-8 animate-fade-in">  
+          <div className="flex items-center justify-center gap-2 mb-4">  
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-3 rounded-full">  
+              <BookOpen className="h-8 w-8 text-white" />  
             </div>
-            <Heart className="h-6 w-6 text-pink-500 animate-pulse" />
+            <Heart className="h-6 w-6 text-pink-500 animate-pulse" />  
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">  
             StudyHub
           </h1>
-          <p className="text-gray-600 mt-2">Your lovable learning companion</p>
+          <p className="text-gray-600 mt-2">Your lovable learning companion</p>  
         </div>
 
-        <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm animate-scale-in">
+
+        <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm animate-scale-in"> 
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-semibold text-gray-800">Welcome Back!</CardTitle>
-            <p className="text-gray-600">Sign in to continue your learning journey</p>
+            <CardDescription className="text-gray-600">Sign in to continue your learning journey</CardDescription> {/* Added CardDescription for consistency */}
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+              <div className="space-y-2"> 
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label> 
                 <Input
                   id="email"
                   type="email"
@@ -63,10 +65,10 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
+                />  
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+              <div className="space-y-2">  
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>  
                 <Input
                   id="password"
                   type="password"
@@ -74,21 +76,28 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
+                />  
               </div>
               <Button 
                 type="submit" 
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
-              >
+              >  
                 Sign In
               </Button>
             </form>
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-600">
-                Demo: Use any email and password to continue
-              </p>
-            </div>
+             {/* Demo text moved to CardFooter for better structure */}
           </CardContent>
+           <CardFooter className="flex flex-col items-center space-y-2 mt-4">
+            <p className="text-sm text-gray-600">
+              Demo: Use any email and password to continue.
+            </p>
+            <p className="text-sm text-gray-600">
+              Don't have an account?{' '}
+              <Link to="/create-account" className="font-medium text-purple-600 hover:text-purple-700 hover:underline">
+                Create one
+              </Link>
+            </p>
+          </CardFooter>
         </Card>
       </div>
     </div>
