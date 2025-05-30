@@ -8,6 +8,10 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard"; 
 import SubjectHub from "./pages/SubjectHub"; 
 import NotFound from "./pages/NotFound"; 
+import { FilePenLine } from 'lucide-react'; // Or any other icon you prefer
+import NotesInterface from './components/NotesInterface'
+import { Button } from "@/components/ui/button"; // Assuming you have a Button component
+
 interface PomodoroContextType {
   pomodoroTime: number;
   isPomodoroRunning: boolean;
@@ -39,6 +43,8 @@ const App = () => {
   const [isPomodoroRunning, setIsPomodoroRunning] = useState(false);
   const [isPomodoroBreak, setIsPomodoroBreak] = useState(false);
   
+  const [isNotesInterfaceOpen, setIsNotesInterfaceOpen] = useState(false);
+
   // Pomodoro Timer Core Logic
   useEffect(() => {
     let intervalId: NodeJS.Timeout | undefined = undefined;
@@ -103,18 +109,35 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster /> 
-        <SonnerToaster richColors position="top-right" />
+        <Toaster />
+        <SonnerToaster richColors position="top-right" /> {/* */}
         <PomodoroContext.Provider value={pomodoroContextValue}>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/subject/:subjectId" element={<SubjectHub />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/" element={<Login />} /> {/* */}
+              <Route path="/dashboard" element={<Dashboard />} /> {/* */}
+              <Route path="/subject/:subjectId" element={<SubjectHub />} /> {/* */}
+              <Route path="*" element={<NotFound />} /> {/* */}
             </Routes>
           </BrowserRouter>
         </PomodoroContext.Provider>
+
+        {/* Floating Action Button for Notes Interface */}
+        <Button
+          onClick={() => setIsNotesInterfaceOpen(true)}
+          className="fixed bottom-8 right-8 h-14 w-14 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-xl hover:scale-110 transition-transform duration-200 z-50"
+          aria-label="Open Notes"
+          size="icon"
+        >
+          <FilePenLine size={24} />
+        </Button>
+
+        {/* Notes Interface Modal */}
+        <NotesInterface
+          isOpen={isNotesInterfaceOpen}
+          onOpenChange={setIsNotesInterfaceOpen}
+        />
+
       </TooltipProvider>
     </QueryClientProvider>
   );

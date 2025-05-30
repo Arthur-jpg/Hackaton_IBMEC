@@ -11,7 +11,6 @@ const subjects = [
     icon: Zap,
     color: 'from-yellow-400 to-orange-500',
     description: 'Circuit analysis, digital systems, and electronic components',
-    progress: 75,
   },
   {
     id: 'software-development',
@@ -19,7 +18,6 @@ const subjects = [
     icon: Code,
     color: 'from-green-400 to-blue-500',
     description: 'Programming fundamentals, algorithms, and software design',
-    progress: 60,
   },
   {
     id: 'calculus',
@@ -27,7 +25,6 @@ const subjects = [
     icon: Calculator,
     color: 'from-purple-400 to-pink-500',
     description: 'Limits, derivatives, integrals, and applications',
-    progress: 40,
   },
   {
     id: 'engineering-data',
@@ -35,7 +32,6 @@ const subjects = [
     icon: BookOpen,
     color: 'from-blue-400 to-indigo-500',
     description: 'Data analysis, statistics, and engineering applications',
-    progress: 85,
   },
 ];
 
